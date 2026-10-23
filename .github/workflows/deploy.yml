@@ -24,7 +24,7 @@ jobs:
       - name: Install, build, and upload site
         uses: withastro/action@v3
         with:
-          node-version: 22 # <-- Add this line to force Node 22+
+          node-version: 24
 
   deploy:
     environment:
