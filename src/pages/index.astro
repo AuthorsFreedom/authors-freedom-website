@@ -1,5 +1,5 @@
 ---
-// src/pages/index.astro
+// src/pages/index.astro (or concept-2.astro)
 ---
 
 <!doctype html>
@@ -7,96 +7,264 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Authors Freedom</title>
-    <!-- Google Monospace Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <title>Authors Freedom — Coming Soon</title>
+
+    <!-- In-head theme flash prevention (pure local script) -->
+    <script is:inline>
+      const getInitialTheme = () => {
+        const storedTheme =
+          typeof localStorage !== "undefined" && localStorage.getItem("theme");
+        if (storedTheme) return storedTheme;
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+      };
+      document.documentElement.setAttribute("data-theme", getInitialTheme());
+    </script>
   </head>
   <body>
+    <!-- Theme Toggle (All icons are inline SVGs) -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+      <svg
+        class="sun-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        ><circle cx="12" cy="12" r="5"></circle><line
+          x1="12"
+          y1="1"
+          x2="12"
+          y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line
+          x1="4.22"
+          y1="4.22"
+          x2="5.64"
+          y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"
+        ></line><line x1="1" y1="12" x2="3" y2="12"></line><line
+          x1="21"
+          y1="12"
+          x2="23"
+          y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"
+        ></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg
+      >
+      <svg
+        class="moon-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        ><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg
+      >
+    </button>
+
     <main class="page-container">
-      <!-- Simulated Writing Software / Text Editor Window -->
       <div class="editor-window">
+        <!-- Titlebar -->
         <div class="editor-titlebar">
           <div class="window-controls">
             <span class="control close"></span>
             <span class="control minimize"></span>
             <span class="control expand"></span>
           </div>
-          <span class="file-name">coming-soon.txt — Editing</span>
+
+          <div class="titlebar-meta">
+            <!-- Inline SVG Pen Nib Icon -->
+            <svg
+              class="titlebar-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+              <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+              <path d="M2 2l7.586 7.586"></path>
+              <circle cx="11" cy="11" r="2"></circle>
+            </svg>
+            <span class="file-name">first-draft.md — Authors Freedom</span>
+          </div>
         </div>
 
         <div class="editor-body">
-          <p class="editor-text">
-            <span id="typed-text"></span><span id="cursor" class="cursor"
-            ></span>
-          </p>
+          <div class="manuscript">
+            <!-- Stage 1 Target (Brand Name) -->
+            <h1 class="title-line">
+              <span id="title-text"></span><span
+                id="title-cursor"
+                class="cursor"></span>
+            </h1>
+
+            <!-- Stage 2 Target (Pre-allocated height, zero jump) -->
+            <p class="subtitle-line">
+              <span id="sub-text"></span><span
+                id="sub-cursor"
+                class="cursor"
+                style="visibility: hidden;"></span>
+            </p>
+          </div>
+        </div>
+
+        <div class="editor-statusbar">
+          <span>MANUSCRIPT MODE</span>
+          <span id="status-mode">STATUS: INITIALIZING</span>
         </div>
       </div>
     </main>
 
-    <!-- Client-side Script for Typing Animation -->
     <script>
-      const textToType = "Coming soon...";
-      const typedTextElement = document.getElementById("typed-text");
-      const cursorElement = document.getElementById("cursor");
+      // Theme Toggle
+      const themeToggle = document.getElementById("theme-toggle");
+      themeToggle?.addEventListener("click", () => {
+        const currentTheme =
+          document.documentElement.getAttribute("data-theme") || "light";
+        const nextTheme = currentTheme === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", nextTheme);
+        localStorage.setItem("theme", nextTheme);
+      });
 
-      let charIndex = 0;
+      // Typing elements
+      const titleTarget = "Authors Freedom";
+      const phrases = [
+        "Coming soon...",
+        "Demnächst...",
+        "Bientôt disponible...",
+        "Próximamente...",
+        "Prossimamente...",
+        "Em breve...",
+      ];
+
+      const titleEl = document.getElementById("title-text");
+      const titleCursor = document.getElementById("title-cursor");
+      const subEl = document.getElementById("sub-text");
+      const subCursor = document.getElementById("sub-cursor");
+      const statusMode = document.getElementById("status-mode");
+
+      let titleChar = 0;
+
+      // STAGE 1: Type the Brand Name
+      function typeTitle() {
+        if (!titleEl || !titleCursor) return;
+
+        titleEl.textContent = titleTarget.substring(0, titleChar);
+
+        if (titleChar < titleTarget.length) {
+          titleChar++;
+          setTimeout(typeTitle, 80 + Math.random() * 60);
+        } else {
+          if (statusMode) statusMode.textContent = "STATUS: DRAFTING";
+          titleCursor.classList.add("slow-blink");
+
+          setTimeout(() => {
+            titleCursor.style.visibility = "hidden";
+            if (subCursor) subCursor.style.visibility = "visible";
+            startSubtitleLoop();
+          }, 800);
+        }
+      }
+
+      // STAGE 2: Multilingual Looper on Line 2
+      let phraseIdx = 0;
+      let subChar = 0;
       let isDeleting = false;
 
-      function typeWriter() {
-        if (!typedTextElement || !cursorElement) return;
+      function startSubtitleLoop() {
+        if (!subEl || !subCursor) return;
 
-        // Current slice of the string
-        typedTextElement.textContent = textToType.substring(0, charIndex);
+        const currentPhrase = phrases[phraseIdx];
+        subEl.textContent = currentPhrase.substring(0, subChar);
 
-        let delay = 240; // Default typing speed
+        let delay = 110;
 
         if (!isDeleting) {
-          // Add a tiny random jitter so typing feels natural/human
-          delay = 100 + Math.random() * 80;
-
-          if (charIndex < textToType.length) {
-            charIndex++;
+          delay = 90 + Math.random() * 70;
+          if (subChar < currentPhrase.length) {
+            subChar++;
           } else {
-            // Reached the end: pause and let the cursor blink slowly
-            cursorElement.classList.add("slow-blink");
+            subCursor.classList.add("slow-blink");
             isDeleting = true;
-            delay = 2500; // Stay at the end for 2.5 seconds
+            delay = 2400;
           }
         } else {
-          // Deleting/Backspacing: faster and steady
-          cursorElement.classList.remove("slow-blink");
+          subCursor.classList.remove("slow-blink");
           delay = 45;
-
-          if (charIndex > 0) {
-            charIndex--;
+          if (subChar > 0) {
+            subChar--;
           } else {
-            // Fully deleted: pause briefly before typing again
             isDeleting = false;
-            delay = 700; // Short pause before restarting
+            phraseIdx = (phraseIdx + 1) % phrases.length;
+            delay = 600;
           }
         }
 
-        setTimeout(typeWriter, delay);
+        setTimeout(startSubtitleLoop, delay);
       }
 
-      // Start typing when the page is loaded
-      typeWriter();
+      setTimeout(typeTitle, 400);
     </script>
 
     <style>
+      /* --- 1. LOCAL FONTS --- */
+
+      /* Local Junicode */
+      @font-face {
+        font-family: "Junicode";
+        src: url("/fonts/Junicode.ttf") format("truetype");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      /* Optional: Local Fira Code (fallback stack kicks in if file is not present) */
+      @font-face {
+        font-family: "Fira Code";
+        src:
+          url("/fonts/FiraCode-Regular.woff2") format("woff2"),
+          url("/fonts/FiraCode-Regular.ttf") format("truetype");
+        font-weight: 400 500;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      /* --- 2. COLOR PALETTES --- */
       :root {
+        --bg-color: #f3f0e8;
+        --window-bg: #fbf9f5;
+        --border-color: #e3ded5;
+        --titlebar-bg: #f5f2ea;
+        --statusbar-bg: #f5f2ea;
+        --typed-text-color: #2a2d34;
+        --muted-text: #928d84;
+        --cursor-color: #0284c7;
+        --toggle-bg: #fbf9f5;
+        --toggle-border: #e3ded5;
+        --toggle-icon-color: #57534e;
+        --window-shadow: 0 20px 45px -12px rgba(60, 50, 40, 0.08);
+      }
+
+      :root[data-theme="dark"] {
         --bg-color: #0e0f12;
         --window-bg: #16181d;
         --border-color: #262933;
         --titlebar-bg: #1c1f26;
-        --text-color: #f1f3f8;
+        --statusbar-bg: #1c1f26;
+        --typed-text-color: #d6dae2;
         --muted-text: #6b7280;
         --cursor-color: #38bdf8;
+        --toggle-bg: #1a1c23;
+        --toggle-border: #2b303c;
+        --toggle-icon-color: #f3f4f6;
+        --window-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
       }
 
       * {
@@ -107,29 +275,66 @@
 
       body {
         background-color: var(--bg-color);
-        color: var(--text-color);
-        font-family: "Fira Code", monospace;
+        /* Native system monospace stack with local Fira Code first */
+        font-family:
+          "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: background-color 0.25s ease;
+      }
+
+      /* Theme Toggle Button */
+      .theme-toggle {
+        position: fixed;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 42px;
+        height: 42px;
+        background: var(--toggle-bg);
+        border: 1px solid var(--toggle-border);
+        color: var(--toggle-icon-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+      }
+      .theme-toggle:hover {
+        transform: scale(1.08);
+      }
+      :root[data-theme="light"] .sun-icon {
+        display: none;
+      }
+      :root[data-theme="light"] .moon-icon {
+        display: block;
+      }
+      :root[data-theme="dark"] .sun-icon {
+        display: block;
+      }
+      :root[data-theme="dark"] .moon-icon {
+        display: none;
       }
 
       .page-container {
         width: 100%;
-        max-width: 650px;
+        max-width: 680px;
         padding: 1.5rem;
       }
 
-      /* Editor Window Styling */
       .editor-window {
         background: var(--window-bg);
         border: 1px solid var(--border-color);
         border-radius: 12px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        box-shadow: var(--window-shadow);
         overflow: hidden;
       }
 
+      /* Titlebar */
       .editor-titlebar {
         background: var(--titlebar-bg);
         padding: 12px 16px;
@@ -143,14 +348,12 @@
         display: flex;
         gap: 8px;
       }
-
       .control {
         width: 12px;
         height: 12px;
         border-radius: 50%;
         display: inline-block;
       }
-
       .close {
         background: #ff5f56;
       }
@@ -161,38 +364,66 @@
         background: #27c93f;
       }
 
-      .file-name {
+      .titlebar-meta {
         margin-left: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .titlebar-icon {
+        color: var(--muted-text);
+        opacity: 0.85;
+        flex-shrink: 0;
+      }
+
+      .file-name {
         font-size: 0.8rem;
         color: var(--muted-text);
       }
 
+      /* Editor Canvas */
       .editor-body {
-        padding: 3rem 2.5rem;
-        min-height: 180px;
+        padding: 3.5rem 3rem;
+        min-height: 220px;
+      }
+
+      .manuscript {
         display: flex;
-        align-items: center;
+        flex-direction: column;
+        gap: 0.75rem;
       }
 
-      .editor-text {
-        font-size: clamp(1.5rem, 4vw, 2.25rem);
-        font-weight: 500;
-        letter-spacing: -0.02em;
-        line-height: 1.4;
+      .title-line {
+        font-family: "Junicode", Georgia, serif;
+        font-size: clamp(2rem, 5vw, 2.75rem);
+        color: var(--typed-text-color);
+        font-weight: 400;
+        line-height: 1.2;
+        min-height: 1.2em;
       }
 
-      /* Blinking Cursor */
+      .subtitle-line {
+        font-family: "Junicode", Georgia, serif;
+        font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+        color: var(--typed-text-color);
+        font-style: italic;
+        opacity: 0.8;
+        line-height: 1.3;
+        min-height: 1.3em;
+      }
+
       .cursor {
         display: inline-block;
-        width: 3px;
-        height: 1.25em;
+        width: 2.5px;
+        height: 1.15em;
         background-color: var(--cursor-color);
         margin-left: 4px;
-        vertical-align: text-bottom;
+        vertical-align: -2px;
         animation: blink 0.75s infinite;
+        font-style: normal;
       }
 
-      /* Slower, relaxed blink when idle at the end */
       .cursor.slow-blink {
         animation: blink 1.2s infinite ease-in-out;
       }
@@ -205,6 +436,18 @@
         50% {
           opacity: 0;
         }
+      }
+
+      .editor-statusbar {
+        background: var(--statusbar-bg);
+        border-top: 1px solid var(--border-color);
+        padding: 8px 16px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+        color: var(--muted-text);
+        user-select: none;
       }
     </style>
   </body>
